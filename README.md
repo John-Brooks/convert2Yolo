@@ -83,6 +83,8 @@ see [example.py](https://github.com/ssaru/convert2Yolo/blob/master/example.py)
 8. --validation_percent
    - Floating point 0-1 percentage of how many images should be written to valid.txt instead of manifest.
 
+    ```bash
+    --validation_percent 0.1
 ​    
 
 ### *.names file example
