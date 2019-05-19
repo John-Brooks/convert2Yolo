@@ -79,7 +79,9 @@ see [example.py](https://github.com/ssaru/convert2Yolo/blob/master/example.py)
 
      ```bash
      --cls_list_file voc.names
-     ```
+
+8. --validation_percent
+   - Floating point 0-1 percentage of how many images should be written to valid.txt instead of manifest.
 
 ​    
 
@@ -116,6 +118,8 @@ tvmonitor
 ### 1. example command
 
 ```bash
+python3 example.py --datasets VOC --img_path ~/Datasets/ConstructionBarrel/annotations/export/VOC/images --label ~/Datasets/ConstructionBarrel/annotations/export/VOC/labels --convert_output_path ~/Datasets/ConstructionBarrel/annotations/export/YOLO/ --img_type .jpeg --manipast_path ~/Datasets/ConstructionBarrel/annotations/export/YOLO --cls_list_file ~/Datasets/ConstructionBarrel/annotations/export/YOLO/barrel.names
+
 python3 example.py --datasets [COCO/VOC/KITTI/UDACITY] --img_path <image_path> --label <label path or annotation file> --convert_output_path <output path> --img_type [".jpg" / ".png"] --manipast_path <output manipast file path> --cls_list_file <*.names file path>
 
 >>

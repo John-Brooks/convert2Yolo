@@ -18,6 +18,7 @@ parser.add_argument('--convert_output_path', type=str, help='directory of label 
 parser.add_argument('--img_type', type=str, help='type of image')
 parser.add_argument('--manipast_path', type=str, help='directory of manipast file', default="./")
 parser.add_argument('--cls_list_file', type=str, help='directory of *.names file', default="./")
+parser.add_argument('--validation_percent', type=float, help='percentage of files to be used as validation set', default=0.0)
 
 
 args = parser.parse_args()
@@ -35,7 +36,7 @@ def main(config):
             flag, data = yolo.generate(data)
             if flag == True:
                 flag, data = yolo.save(data, config["output_path"], config["img_path"] ,
-                                       config["img_type"], config["manipast_path"])
+                                       config["img_type"], config["manipast_path"], config["validation_percent"])
 
                 if flag == False:
                     print("Saving Result : {}, msg : {}".format(flag, data))
@@ -59,7 +60,7 @@ def main(config):
 
             if flag == True:
                 flag, data = yolo.save(data, config["output_path"], config["img_path"],
-                                        config["img_type"], config["manipast_path"])
+                                        config["img_type"], config["manipast_path"], config["validation_percent"])
 
                 if flag == False:
                     print("Saving Result : {}, msg : {}".format(flag, data))
@@ -81,7 +82,7 @@ def main(config):
 
             if flag == True:
                 flag, data = yolo.save(data, config["output_path"], config["img_path"],
-                                       config["img_type"], config["manipast_path"])
+                                       config["img_type"], config["manipast_path"], config["validation_percent"])
 
                 if flag == False:
                     print("Saving Result : {}, msg : {}".format(flag, data))
@@ -103,7 +104,7 @@ def main(config):
 
             if flag == True:
                 flag, data = yolo.save(data, config["output_path"], config["img_path"],
-                                       config["img_type"], config["manipast_path"])
+                                       config["img_type"], config["manipast_path"], config["validation_percent"])
 
                 if flag == False:
                     print("Saving Result : {}, msg : {}".format(flag, data))
@@ -127,6 +128,7 @@ if __name__ == '__main__':
         "manipast_path": args.manipast_path,
         "output_path": args.convert_output_path,
         "cls_list": args.cls_list_file,
+        "validation_percent": args.validation_percent,
     }
 
     main(config)

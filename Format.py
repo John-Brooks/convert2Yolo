@@ -229,10 +229,14 @@ class VOC:
             printProgressBar(0, progress_length, prefix='\nVOC Parsing:'.ljust(15), suffix='Complete', length=40)
             for filename in filenames:
 
-                xml = open(os.path.join(dir_path, filename), "r")
+                try:                
+                    xml = open(os.path.join(dir_path, filename), "r")
+                    tree = Et.parse(xml)
+                    root = tree.getroot()
+                except: 
+                    print(filename)
     
-                tree = Et.parse(xml)
-                root = tree.getroot()
+                
 
                 xml_size = root.find("size")
                 size = {
@@ -258,12 +262,16 @@ class VOC:
                     }
 
                     xml_bndbox = _object.find("bndbox")
-                    bndbox = {
-                        "xmin": float(xml_bndbox.find("xmin").text),
-                        "ymin": float(xml_bndbox.find("ymin").text),
-                        "xmax": float(xml_bndbox.find("xmax").text),
-                        "ymax": float(xml_bndbox.find("ymax").text)
-                    }
+                    try:
+	                    bndbox = {
+	                        "xmin": float(xml_bndbox.find("xmin").text),
+	                        "ymin": float(xml_bndbox.find("ymin").text),
+	                        "xmax": float(xml_bndbox.find("xmax").text),
+	                        "ymax": float(xml_bndbox.find("ymax").text)
+	                    }
+                    except:
+                        print("\nfile:" + filename + " is missing a bounding box\n")
+                        return False, "label missing bounding box"
                     tmp["bndbox"] = bndbox
                     obj[str(obj_index)] = tmp
 
@@ -700,8 +708,10 @@ class YOLO:
 
                     b = (float(xmin), float(xmax), float(ymin), float(ymax))
                     bb = self.coordinateCvt2YOLO((img_width, img_height), b)
-
-                    cls_id = self.cls_list.index(data[key]["objects"][str(idx)]["name"])
+                    try:
+                        cls_id = self.cls_list.index(data[key]["objects"][str(idx)]["name"])
+                    except:
+                        continue
 
                     bndbox = "".join(["".join([str(e), " "]) for e in bb])
                     contents = "".join([contents, str(cls_id), " ", bndbox[:-1], "\n"])
@@ -724,7 +734,7 @@ class YOLO:
 
             return False, msg
 
-    def save(self, data, save_path, img_path, img_type, manipast_path):
+    def save(self, data, save_path, img_path, img_type, manipast_path, validation_percent):
 
         try:
 
@@ -732,14 +742,25 @@ class YOLO:
             progress_cnt = 0
             printProgressBar(0, progress_length, prefix='\nYOLO Saving:'.ljust(15), suffix='Complete', length=40)
 
-            with open(os.path.abspath(os.path.join(manipast_path, "manifast.txt")), "w") as manipast_file:
-
+            with open(os.path.abspath(os.path.join(manipast_path, "manifest.txt")), "w") as manipast_file:
+                validation_file = open(os.path.abspath(os.path.join(manipast_path, "valid.txt")), "w")                
+                
+                num_manifest_files = 0
+                num_validation_files = 0              
                 for key in data:
-                    manipast_file.write(os.path.abspath(os.path.join(img_path, "".join([key, img_type, "\n"]))))
 
+                    print((validation_percent * num_manifest_files) - num_validation_files )                    
+                    if (validation_percent * num_manifest_files) - num_validation_files < 1 :
+                        manipast_file.write(os.path.abspath(os.path.join(img_path, "".join([key, img_type, "\n"]))))
+                    else:
+                        validation_file.write(os.path.abspath(os.path.join(img_path, "".join([key, img_type, "\n"]))))
+                        num_validation_files += 1
+                    
+                    num_manifest_files += 1
+                    
                     with open(os.path.abspath(os.path.join(save_path, "".join([key, ".txt"]))), "w") as output_txt_file:
                         output_txt_file.write(data[key])
-
+                    
 
                     printProgressBar(progress_cnt + 1, progress_length, prefix='YOLO Saving:'.ljust(15),
                                      suffix='Complete',
